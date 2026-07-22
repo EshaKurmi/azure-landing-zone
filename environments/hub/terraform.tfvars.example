@@ -1,0 +1,12 @@
+location    = "centralindia"
+environment = "hub"
+
+hub_vnet_address_space       = ["10.0.0.0/16"]
+bastion_subnet_prefix        = ["10.0.1.0/26"]
+shared_services_subnet_prefix = ["10.0.2.0/24"]
+
+tags = {
+  Project    = "azure-landing-zone"
+  Owner      = "your-name"
+  CostCenter = "shared"
+}

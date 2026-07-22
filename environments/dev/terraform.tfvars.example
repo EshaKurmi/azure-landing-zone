@@ -1,0 +1,23 @@
+location    = "centralindia"
+environment = "dev"
+
+spoke_vnet_address_space = ["10.1.0.0/16"]
+app_subnet_prefix         = ["10.1.1.0/24"]
+
+vm_size         = "Standard_B1s"
+admin_username  = "azureadmin"
+
+# Paste the contents of your public key file (~/.ssh/id_rsa.pub), one line, starting with ssh-rsa or ssh-ed25519
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAA...your-public-key..."
+
+# ---- Copy these 4 values from: cd ../hub && terraform output ----
+hub_vnet_id                 = "/subscriptions/xxxx/resourceGroups/rg-lz-hub/providers/Microsoft.Network/virtualNetworks/vnet-lz-hub"
+hub_vnet_name                = "vnet-lz-hub"
+hub_resource_group_name      = "rg-lz-hub"
+log_analytics_workspace_id   = "/subscriptions/xxxx/resourceGroups/rg-lz-hub/providers/Microsoft.OperationalInsights/workspaces/log-lz-hub"
+
+tags = {
+  Project    = "azure-landing-zone"
+  Owner      = "your-name"
+  CostCenter = "dev"
+}
