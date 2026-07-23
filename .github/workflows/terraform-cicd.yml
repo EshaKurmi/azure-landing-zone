@@ -66,7 +66,12 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var="ssh_public_key=${{ secrets.VM_SSH_PUBLIC_KEY }}"
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "hub" ]; then
+            terraform plan -out=tfplan
+          else
+            terraform plan -out=tfplan -var="ssh_public_key=${{ secrets.VM_SSH_PUBLIC_KEY }}"
+          fi
         continue-on-error: false
 
       - name: Upload Plan Artifact
