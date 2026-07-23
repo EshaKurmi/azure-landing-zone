@@ -27,8 +27,8 @@ variable "shared_services_subnet_prefix" {
 variable "tags" {
   type = map(string)
   default = {
-    Project     = "azure-landing-zone"
-    Owner       = "cloud-team"
-    CostCenter  = "shared"
+    Project    = "azure-landing-zone"
+    Owner      = "cloud-team"
+    CostCenter = "shared"
   }
 }

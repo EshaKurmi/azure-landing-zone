@@ -23,19 +23,19 @@ module "hub_vnet" {
 
 # Azure Bastion requires a subnet literally named "AzureBastionSubnet" - do not rename.
 module "bastion_subnet" {
-  source                = "../../modules/subnet"
-  name                  = "AzureBastionSubnet"
-  resource_group_name   = module.resource_group.name
-  virtual_network_name  = module.hub_vnet.name
-  address_prefixes      = var.bastion_subnet_prefix
+  source               = "../../modules/subnet"
+  name                 = "AzureBastionSubnet"
+  resource_group_name  = module.resource_group.name
+  virtual_network_name = module.hub_vnet.name
+  address_prefixes     = var.bastion_subnet_prefix
 }
 
 module "shared_services_subnet" {
-  source                = "../../modules/subnet"
-  name                  = "snet-shared-services"
-  resource_group_name   = module.resource_group.name
-  virtual_network_name  = module.hub_vnet.name
-  address_prefixes      = var.shared_services_subnet_prefix
+  source               = "../../modules/subnet"
+  name                 = "snet-shared-services"
+  resource_group_name  = module.resource_group.name
+  virtual_network_name = module.hub_vnet.name
+  address_prefixes     = var.shared_services_subnet_prefix
 }
 
 module "bastion" {
