@@ -13,29 +13,15 @@ resource "random_string" "storage_suffix" {
   numeric = true
 }
 
-# Reads the Hub environment's state directly - so hub_vnet_id, hub_vnet_name,
-# hub_resource_group_name and the Log Analytics workspace ID never need to be
-# copy-pasted into tfvars or CI/CD variables. This is how real teams link
-# environments together instead of passing values around manually.
-data "terraform_remote_state" "hub" {
-  backend = "azurerm"
-  config = {
-    resource_group_name  = "tfstate-rg"
-    storage_account_name = var.tfstate_storage_account_name
-    container_name       = "tfstate"
-    key                  = "hub.terraform.tfstate"
-  }
-}
-
 module "resource_group" {
-  source   = "../../modules/resource-group"
+  source = "../../modules/resource-group"
   name     = "rg-${local.workload}"
   location = var.location
   tags     = local.common_tags
 }
 
 module "spoke_vnet" {
-  source              = "../../modules/vnet"
+  source = "../../modules/vnet"
   name                = "vnet-${local.workload}"
   location            = var.location
   resource_group_name = module.resource_group.name
@@ -44,7 +30,7 @@ module "spoke_vnet" {
 }
 
 module "app_nsg" {
-  source              = "../../modules/nsg"
+  source = "../../modules/nsg"
   name                = "nsg-${local.workload}-app"
   location            = var.location
   resource_group_name = module.resource_group.name
@@ -98,7 +84,7 @@ module "app_subnet" {
 }
 
 module "app_nic" {
-  source              = "../../modules/nic"
+  source = "../../modules/nic"
   name                = "nic-${local.workload}-vm01"
   location            = var.location
   resource_group_name = module.resource_group.name
@@ -107,12 +93,12 @@ module "app_nic" {
 }
 
 module "storage_account" {
-  source                        = "../../modules/storage-account"
-  name                          = "sttestlz${random_string.storage_suffix.result}"
-  resource_group_name           = module.resource_group.name
-  location                      = var.location
-  public_network_access_enabled = false
-  tags                          = local.common_tags
+  source                         = "../../modules/storage-account"
+  name                           = "sttestlz${random_string.storage_suffix.result}"
+  resource_group_name            = module.resource_group.name
+  location                       = var.location
+  public_network_access_enabled  = false
+  tags                           = local.common_tags
 }
 
 module "app_vm" {
@@ -131,9 +117,9 @@ module "app_vm" {
 
 module "hub_peering" {
   source                    = "../../modules/vnet-peering"
-  hub_vnet_name             = data.terraform_remote_state.hub.outputs.hub_vnet_name
-  hub_vnet_id               = data.terraform_remote_state.hub.outputs.hub_vnet_id
-  hub_resource_group_name   = data.terraform_remote_state.hub.outputs.hub_resource_group_name
+  hub_vnet_name             = var.hub_vnet_name
+  hub_vnet_id               = var.hub_vnet_id
+  hub_resource_group_name   = var.hub_resource_group_name
   spoke_vnet_name           = module.spoke_vnet.name
   spoke_vnet_id             = module.spoke_vnet.id
   spoke_resource_group_name = module.resource_group.name
@@ -145,7 +131,7 @@ module "nsg_diagnostics" {
   source                     = "../../modules/diagnostic-setting"
   name                       = "diag-nsg-${local.workload}"
   target_resource_id         = module.app_nsg.id
-  log_analytics_workspace_id = data.terraform_remote_state.hub.outputs.log_analytics_workspace_id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
   log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
   metric_categories          = []
 }
@@ -154,7 +140,7 @@ module "vm_diagnostics" {
   source                     = "../../modules/diagnostic-setting"
   name                       = "diag-vm-${local.workload}"
   target_resource_id         = module.app_vm.id
-  log_analytics_workspace_id = data.terraform_remote_state.hub.outputs.log_analytics_workspace_id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
   log_categories             = []
   metric_categories          = ["AllMetrics"]
 }
