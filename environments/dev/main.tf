@@ -14,14 +14,14 @@ resource "random_string" "storage_suffix" {
 }
 
 module "resource_group" {
-  source = "../../modules/resource-group"
+  source   = "../../modules/resource-group"
   name     = "rg-${local.workload}"
   location = var.location
   tags     = local.common_tags
 }
 
 module "spoke_vnet" {
-  source = "../../modules/vnet"
+  source              = "../../modules/vnet"
   name                = "vnet-${local.workload}"
   location            = var.location
   resource_group_name = module.resource_group.name
@@ -30,7 +30,7 @@ module "spoke_vnet" {
 }
 
 module "app_nsg" {
-  source = "../../modules/nsg"
+  source              = "../../modules/nsg"
   name                = "nsg-${local.workload}-app"
   location            = var.location
   resource_group_name = module.resource_group.name
@@ -84,7 +84,7 @@ module "app_subnet" {
 }
 
 module "app_nic" {
-  source = "../../modules/nic"
+  source              = "../../modules/nic"
   name                = "nic-${local.workload}-vm01"
   location            = var.location
   resource_group_name = module.resource_group.name
@@ -93,12 +93,12 @@ module "app_nic" {
 }
 
 module "storage_account" {
-  source                         = "../../modules/storage-account"
-  name                           = "stdevlz${random_string.storage_suffix.result}"
-  resource_group_name            = module.resource_group.name
-  location                       = var.location
-  public_network_access_enabled  = false
-  tags                           = local.common_tags
+  source                        = "../../modules/storage-account"
+  name                          = "stdevlz${random_string.storage_suffix.result}"
+  resource_group_name           = module.resource_group.name
+  location                      = var.location
+  public_network_access_enabled = false
+  tags                          = local.common_tags
 }
 
 module "app_vm" {
