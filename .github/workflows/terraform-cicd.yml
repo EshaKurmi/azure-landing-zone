@@ -65,12 +65,31 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Get Hub Outputs (for spokes only)
+        if: github.event.inputs.environment != 'hub'
+        working-directory: environments/hub
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=tfstate-rg" \
+            -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=hub.terraform.tfstate"
+          echo "HUB_VNET_ID=$(terraform output -raw hub_vnet_id)" >> $GITHUB_ENV
+          echo "HUB_VNET_NAME=$(terraform output -raw hub_vnet_name)" >> $GITHUB_ENV
+          echo "HUB_RG_NAME=$(terraform output -raw hub_resource_group_name)" >> $GITHUB_ENV
+          echo "HUB_LAW_ID=$(terraform output -raw log_analytics_workspace_id)" >> $GITHUB_ENV
+
       - name: Terraform Plan
         run: |
           if [ "${{ github.event.inputs.environment }}" = "hub" ]; then
             terraform plan -out=tfplan
           else
-            terraform plan -out=tfplan -var="ssh_public_key=${{ secrets.VM_SSH_PUBLIC_KEY }}"
+            terraform plan -out=tfplan \
+              -var="ssh_public_key=${{ secrets.VM_SSH_PUBLIC_KEY }}" \
+              -var="hub_vnet_id=$HUB_VNET_ID" \
+              -var="hub_vnet_name=$HUB_VNET_NAME" \
+              -var="hub_resource_group_name=$HUB_RG_NAME" \
+              -var="log_analytics_workspace_id=$HUB_LAW_ID"
           fi
         continue-on-error: false
 
