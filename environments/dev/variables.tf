@@ -34,7 +34,9 @@ variable "ssh_public_key" {
   type        = string
 }
 
-# These come from the hub environment's terraform output (terraform output -json)
+# These come from the hub environment's terraform output.
+# CI/CD fetches them automatically; for manual runs, pass them with -var
+# or paste them into terraform.tfvars (see terraform.tfvars.example).
 variable "hub_vnet_id" {
   type = string
 }
